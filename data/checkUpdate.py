@@ -8,7 +8,6 @@ ret = os.system(
     "wget --timeout=10 --tries=1 -O data/data.new.json https://h5.baochaojianghu.com/data/data.min.json > /dev/null 2>&1"
 )
 if ret == 0:
-    print("测试")
     print("从图鉴网获取最新数据成功。")
     new=json.load(open("data/data.new.json"))
     old=json.load(open("data/data.min.json"))
