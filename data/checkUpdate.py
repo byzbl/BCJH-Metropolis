@@ -5,7 +5,7 @@ import json
 
 print("正在检查更新...")
 ret = os.system(
-    "wget --timeout=10 --tries=1 -O data/data.new.json https://yuwenxifan.github.io/bcjhMobile/data/data.min.json > /dev/null 2>&1"
+    "wget --timeout=10 --tries=1 -O data/data.new.json https://h5.baochaojianghu.com/data/data.min.json > /dev/null 2>&1"
 )
 if ret == 0:
     print("从图鉴网获取最新数据成功。")
