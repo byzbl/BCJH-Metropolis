@@ -3,9 +3,11 @@ name: Byzbl Update Game Data and Recompile wasm
 on:
     workflow_dispatch:
     push:
-        paths-ignore:
-            - 'data/**'
-            - 'build_js/**'
+        tags:
+            - '*'
+        #paths-ignore:
+         #   - 'data/**'
+          #  - 'build_js/**'
 
 
 jobs:
