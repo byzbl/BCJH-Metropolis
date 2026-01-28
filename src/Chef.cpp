@@ -62,7 +62,7 @@ void Chef::loadAppendChef(CList &chefList, int chefRarity,
 
     const Json::Value &chefs = gameData["chefs"];
 
-    std::mmap<int, std::vector<int>> ultimateSkills;
+    std::map<int, std::vector<int>> ultimateSkills;
     loadUltimateSkills(ultimateSkills, usrData["userUltimate"]);
     CList newChefList;
     auto chefGot = usrData["chefGot"];
