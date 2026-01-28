@@ -37,10 +37,11 @@ size_t NUM_GUESTS, CHEFS_PER_GUEST;
 /**
  * @return  pair<Json::Value gameData, Json::Value userData>
  */
-std::pair<Json::Value, Json::Value> loadJson(std::stringstream &userDataSs) {
+std::pair<Json::Value, Json::Value> loadJson(std::stringstream &userDataSs,
+    std::stringstream &gameCfgSs) {
     Json::Value gameData;
     Json::Value userData;
-    std::ifstream gameDataF("data.min.json", std::ifstream::binary);
+   /** std::ifstream gameDataF("data.min.json", std::ifstream::binary);
     if (!gameDataF.good()) {
         gameDataF =
             std::ifstream("../data/data.min.json", std::ifstream::binary);
@@ -53,7 +54,8 @@ std::pair<Json::Value, Json::Value> loadJson(std::stringstream &userDataSs) {
     }
     gameDataF >> gameData;
     gameDataF.close();
-
+    */
+    gameCfgSs >> gameData;
     userDataSs >> userData;
     if (userData.isMember("decorationEffect")) {
         userData["type"] = "in-game";
@@ -69,7 +71,7 @@ std::string
 #endif
     runjs(const std::string &userDataIn, const std::string &ruleDataIn,
           int targetScore, int iterChef, int iterRecipe, bool allowTool,
-          const std::string &recover_string
+          const std::string &recover_string, const std::string &gameCfgIn
 #ifdef EMSCRIPTEN_PROGRESS
           ,
           emscripten::val postProgress
@@ -88,6 +90,7 @@ std::string
     // seed = 2115400760;
     std::stringstream userDataSs(userDataIn);
     std::stringstream ruleDataSs(ruleDataIn);
+    std::stringstream gameCfgSs(gameCfgIn);
     Json::Value ruleDataJson;
     ruleDataSs >> ruleDataJson;
 
@@ -101,7 +104,7 @@ std::string
         NUM_GUESTS = num_guests;
         CHEFS_PER_GUEST = chefs_per_guest;
     }
-    auto [gameData, userData] = loadJson(userDataSs);
+    auto [gameData, userData] = loadJson(userDataSs,gameCfgSs);
     auto [recipeList, chefList] = loadJson(gameData, userData, allowTool);
     testJsonUpdate(gameData, userData);
 
