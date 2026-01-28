@@ -36,17 +36,21 @@ void initBuff(const Json::Value usrBuff) {
     Chef::addGlobalAbilityMale(getInt(usrBuff["Male"]));
     Chef::addGlobalAbilityFemale(getInt(usrBuff["Female"]));
     Chef::setGlobalAbilityAll(getInt(usrBuff["All"]));
+
 }
-void splitUltimateSkill(std::map<int, int> &ultimateSkills,
+
+void splitUltimateSkill(std::map<int, std::vector<int>> &ultimateSkills,
                         const Json::Value &ids) {
     for (auto pair : ids) {
         auto str = pair.asString();
         int id = atoi(str.substr(0, str.find(",")).c_str());
         int skillId = atoi(str.substr(str.find(",") + 1).c_str());
-        ultimateSkills[id] = skillId;
+
+        // 改为将 skillId 添加到对应 id 的 vector 中
+        ultimateSkills[id].push_back(skillId);
     }
 }
-void loadUltimateSkills(std::map<int, int> &ultimateSkills,
+void loadUltimateSkills(std::map<int, std::vector<int>> &ultimateSkills,
                         const Json::Value &usrBuff) {
 
     splitUltimateSkill(ultimateSkills, usrBuff["Partial"]["id"]);
@@ -58,7 +62,7 @@ void Chef::loadAppendChef(CList &chefList, int chefRarity,
 
     const Json::Value &chefs = gameData["chefs"];
 
-    std::map<int, int> ultimateSkills;
+    std::mmap<int, std::vector<int>> ultimateSkills;
     loadUltimateSkills(ultimateSkills, usrData["userUltimate"]);
     CList newChefList;
     auto chefGot = usrData["chefGot"];
@@ -72,7 +76,8 @@ void Chef::loadAppendChef(CList &chefList, int chefRarity,
             if (ultimateSkills.find(id) != ultimateSkills.end()) {
                 newChefList.push_back(Chef(chef, ultimateSkills[id]));
             } else {
-                newChefList.push_back(Chef(chef, -1));
+                std::vector<int> ultimateSkillIds;
+                newChefList.push_back(Chef(chef, ultimateSkillIds));
             }
         }
     }
@@ -110,11 +115,20 @@ void Chef::loadAppendChefInGame(CList &chefList, int chefRarity,
             if (chef["rarity"].asInt() != chefRarity) {
                 continue;
             }
+            std::vector<int> ultimateSkillIds;
             if (chefGot[id]["ult"].asString() == "是") {
-                newChefList.push_back(
-                    Chef(chef, chef["ultimateSkill"].asInt()));
+                if (chef["ultimateSkillList"].isArray()) {
+                    // 如果是数组，遍历所有元素
+                    for (const auto& skillId : chef["ultimateSkillList"]) {
+                        ultimateSkillIds.push_back(skillId.asInt());
+                    }
+                } else {
+                    // 兼容单个值的情况
+                    ultimateSkillIds.push_back(chef["ultimateSkillList"].asInt());
+                }
+                newChefList.push_back(Chef(chef, ultimateSkillIds));
             } else {
-                newChefList.push_back(Chef(chef, -1));
+                newChefList.push_back(Chef(chef, ultimateSkillIds));
             }
             if (chefGot[id].isMember("equip")) {
                 int equipID = chefGot[id]["equip"].asInt();
@@ -154,7 +168,7 @@ std::string Chef::getName(bool wTool) const {
     }
     return this->name + toolName;
 }
-Chef::Chef(Json::Value &chef, int ultimateSkillId)
+Chef::Chef(Json::Value &chef,  const std::vector<int> &ultimateSkillIds)
     : id(chef["chefId"].asInt()), name(chef["name"].asString()) {
     if (chef.isMember("chefId") && chef.isMember("name") &&
         chef.isMember("skill")) {
@@ -186,8 +200,11 @@ Chef::Chef(Json::Value &chef, int ultimateSkillId)
     }
     *(this->skill) += globalSkill;
     this->addSkill(chef["skill"].asInt());
-    if (ultimateSkillId != -1) {
-        this->addSkill(ultimateSkillId);
+    // 处理多个终极技能
+    for (int skillId : ultimateSkillIds) {
+        if (skillId != -1) {
+            this->addSkill(skillId);
+        }
     }
     this->tool.type = NOT_EQUIPPED;
 }

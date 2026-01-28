@@ -55,13 +55,34 @@ _reconstructUserUltimate(const Json::Value &gameData,
     for (const auto &c : directUserData["chefs"]) {
         if (c["ult"].asString() == "是") {
             int chefID = c["id"].asInt();
-            int id = chefInfo[chefID]["ultimateSkill"].asInt();
-            if (Skill::globalSkillList.contains(id)) {
-                globalBuff += Skill::globalSkillList[id];
-                // globalBuff.print(true);
-                globalBuffMale += Skill::globalMaleSkillList[id];
-                globalBuffFemale += Skill::globalFemaleSkillList[id];
+
+            // 修改为处理数组
+            if (chefInfo[chefID]["ultimateSkillList"].isArray()) {
+                for (const auto& skillElement : chefInfo[chefID]["ultimateSkillList"]) {
+                    int id = skillElement.asInt();
+                    if (Skill::globalSkillList.contains(id)) {
+                        globalBuff += Skill::globalSkillList[id];
+                        globalBuffMale += Skill::globalMaleSkillList[id];
+                        globalBuffFemale += Skill::globalFemaleSkillList[id];
+                    }
+                }
+            } else {
+                // 兼容单个值的情况
+                int id = chefInfo[chefID]["ultimateSkillList"].asInt();
+                if (Skill::globalSkillList.contains(id)) {
+                    globalBuff += Skill::globalSkillList[id];
+                    globalBuffMale += Skill::globalMaleSkillList[id];
+                    globalBuffFemale += Skill::globalFemaleSkillList[id];
+                }
             }
+
+            //int id = chefInfo[chefID]["ultimateSkill"].asInt();
+           // if (Skill::globalSkillList.contains(id)) {
+           //     globalBuff += Skill::globalSkillList[id];
+                // globalBuff.print(true);
+          //      globalBuffMale += Skill::globalMaleSkillList[id];
+          //      globalBuffFemale += Skill::globalFemaleSkillList[id];
+           // }
         }
     }
     return {std::move(globalBuff), std::move(globalBuffMale),

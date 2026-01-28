@@ -92,7 +92,7 @@ class Chef {
                                      bool allowTool = true);
 
     std::string getName(bool wTool = true) const;
-    Chef(Json::Value &v, int ultimateSkillId);
+    Chef(Json::Value &v,  const std::vector<int> &ultimateSkillIds);
     Chef() { id = -1; }
     void print() const;
     void modifyTool(Tool);
