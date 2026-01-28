@@ -11,19 +11,33 @@ on:
 
 
 jobs:
-    update:
-        continue-on-error: false
+    recompile-ems:
         runs-on: ubuntu-latest
+        if: ${{ !cancelled() }}
         steps:
+            - uses: mymindstorm/setup-emsdk@v13
+              with:
+                  version: 3.1.47
+            - name: version
+              run: emcc --version
             - uses: actions/checkout@v2
-            - name: Update Game Data
-              run: python data/checkUpdate.py
+            - run: git pull
+            - run: sed -zi 's/\n//g' data/data.min.json
+            - run: sed -zi 's/  //g' data/data.min.json
+            - name: Recompile
+              run: |
+                  cd build_js
+                  emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
+                  emmake make
             - name: Commit files
               run: |
                   git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   git config --local user.name "github-actions[bot]"
-                  git add data -f
-                  git commit -m "ZBL Update Game Data"
+                  git add build_js
+                  git commit -m "Recompile Emscripten"
+            - name: Remove CmakeFiles
+              run: |
+                  rm -rf build_js/CMakeFiles
             - name: Push changes
               uses: ad-m/github-push-action@master
               with:
