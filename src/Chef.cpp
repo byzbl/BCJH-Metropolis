@@ -463,7 +463,7 @@ void Skill::loadJson(const Json::Value &v) {
                         *perc.materialBuff[specificType] = value;
                     } else {
                         throw UnknownSkillException(
-                            skillJson["desc"].asString() + "（debug代码：" +
+                            skillJson["desc"].asString() + "（1debug代码：" +
                             type + ")");
                     }
                 } else if (type == "BasicPrice") {
@@ -471,7 +471,7 @@ void Skill::loadJson(const Json::Value &v) {
                     if (calString != "Percent" && calString != "Abs") {
                         throw UnknownSkillException(
                             "cal值不是Percent或Abs，来自" +
-                            skillJson["desc"].asString() + "（debug代码：" +
+                            skillJson["desc"].asString() + "（2debug代码：" +
                             type + ")");
                     }
                     if (calString == "Percent")
@@ -486,7 +486,7 @@ void Skill::loadJson(const Json::Value &v) {
                     if (calString != "Percent" && calString != "Abs") {
                         throw UnknownSkillException(
                             "cal值不是Percent或Abs，来自" +
-                            skillJson["desc"].asString() + "（debug代码：" +
+                            skillJson["desc"].asString() + "（3debug代码：" +
                             type + ")");
                     }
 
@@ -506,7 +506,7 @@ void Skill::loadJson(const Json::Value &v) {
                         *ptr->materialBuff[type_name] = value;
                     } else {
                         throw UnknownSkillException(
-                            skillJson["desc"].asString() + "（debug代码：" +
+                            skillJson["desc"].asString() + "（4debug代码：" +
                             type + ")");
                     }
 
@@ -583,7 +583,7 @@ void Skill::loadJson(const Json::Value &v) {
         }
     }
     for (auto pair : missingSkills) {
-        UnknownSkillWarning(pair.second + "（debug代码：" + pair.first + "）");
+        UnknownSkillWarning(pair.second + "（5debug代码：" + pair.first + "）");
     }
 }
 void Chef::addSkill(int id) {
